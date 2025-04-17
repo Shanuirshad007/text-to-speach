@@ -1,2 +1,2 @@
 # text-to-speach
-OpenAI Text-to-Speech SPA Based
+OpenAI Text-to-Speech SPA

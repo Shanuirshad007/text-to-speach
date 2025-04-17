@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Convert any text into speech using OpenAI's powerful models. Choose the voice and vibe to create personalized audio. Secure, fast, and browser-based." />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8" />
+
+<!-- Open Graph for social media -->
+<meta property="og:title" content="Text to Speech with OpenAI" />
+<meta property="og:description" content="Choose voice, vibe, and generate speech securely in your browser." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://yourdomain.com" />
+<meta property="og:image" content="https://yourdomain.com/og-image.png" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Text to Speech with OpenAI" />
+<meta name="twitter:description" content="Generate audio from text with vibe & voice settings." />
+<meta name="twitter:image" content="https://yourdomain.com/twitter-image.png" />
+  <title>Text-to-Speech with OpenAI</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">OpenAI Text-to-Speech</h1>
+
+    <div class="alert alert-info mt-3" role="alert">
+        <h5 class="alert-heading">🔐 Using Your OpenAI API Key</h5>
+        <p>To use this app, you'll need your own OpenAI API key.</p>
+        <ul class="mb-2">
+          <li>Go to <a href="https://platform.openai.com/account/api-keys" target="_blank">OpenAI API Keys</a> and click <strong>"Create new secret key"</strong>.</li>
+          <li>Copy your key and paste it into the field below — this is used only by your browser.</li>
+          <li><strong>We do not store or access your API key.</strong></li>
+          <li>Make sure to store your key somewhere safe — OpenAI won't show it to you again after you leave the page!</li>
+        </ul>
+        <p class="mb-0"><strong>Keep your key private</strong> — anyone with it could use your credits.</p>
+      </div>
+
+      <div class="mb-3">
+        <label for="apiKey" class="form-label">OpenAI API Key</label>
+        <input type="password" class="form-control" id="apiKey" placeholder="sk-..." />
+      
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <button
+            type="button"
+            class="btn btn-outline-primary btn-sm"
+            id="storeKeyBtn"
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            title="Stores your OpenAI API key in your browser so you don’t have to enter it again. We never access or store your key.">
+            💾 Store API Key in Browser
+          </button>
+
+            <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                id="removeKeyBtn"
+                title="Remove the stored key from this browser">
+                🗑️ Remove Key
+            </button>
+          <span id="keyStatus" class="text-success d-none">✅ Saved!</span>
+        </div>
+      </div>
+
+    <div class="mb-3">
+      <label for="voiceSelect" class="form-label">Choose a Voice</label>
+      <select class="form-select" id="voiceSelect">
+        <option value="alloy">Alloy</option>
+        <option value="echo">Echo</option>
+        <option value="fable">Fable</option>
+        <option value="onyx">Onyx</option>
+        <option value="nova">Nova</option>
+        <option value="shimmer">Shimmer</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="textInput" class="form-label">Text to Convert</label>
+      <textarea class="form-control" id="textInput" rows="4" placeholder="Enter text here..."></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="vibeInput" class="form-label">Choose a Vibe</label>
+        <select class="form-select" id="vibeInput">
+          <option value="">-- None --</option>
+          <option value="Calm and soothing, like a therapist reassuring a patient.">Calm & Reassuring</option>
+          <option value="Energetic and cheerful, like a camp counselor.">Energetic & Cheerful</option>
+          <option value="Serious and professional, like a news anchor.">Professional</option>
+          <option value="Casual and laid-back, like talking to a friend.">Casual & Friendly</option>
+        </select>
+      </div>
+
+    <button id="generateBtn" class="btn btn-primary">Generate Speech</button>
+
+    <div class="mt-4" id="audioContainer">
+        <h5>Generated Audios:</h5>
+        <div id="audioList" class="d-flex flex-column gap-3"></div>
+      </div>
+
+      <section class="mt-5">
+        <h2>What is This?</h2>
+        <p>
+          This is a browser-based Text-to-Speech app powered by OpenAI’s speech models.
+          Users can generate lifelike speech from any text using customizable voices and personality instructions ("vibes").
+          Your API key stays on your device — we never store or access it.
+        </p>
+      
+        <h3>Features</h3>
+        <ul>
+          <li>Supports multiple OpenAI voices</li>
+          <li>Customizable vibes and personality</li>
+          <li>Secure: all processing happens in your browser</li>
+          <li>Play or download generated audio instantly</li>
+        </ul>
+      </section>
+  </div>
+
+  <script>
+  const generateBtn = document.getElementById("generateBtn");
+  const audioList = document.getElementById("audioList");
+
+  generateBtn.addEventListener("click", async () => {
+    const apiKey = document.getElementById("apiKey").value;
+    const voice = document.getElementById("voiceSelect").value;
+    const text = document.getElementById("textInput").value.trim();
+    const vibe = document.getElementById("vibeInput").value.trim();
+
+    if (!apiKey || !text) {
+      alert("Please enter your API key and some text.");
+      return;
+    }
+
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...`;
+
+    try {
+    //   const response = await fetch("https://api.openai.com/v1/audio/speech", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "Authorization": `Bearer ${apiKey}`
+    //     },
+    //     body: JSON.stringify({
+    //       model: "tts-1",
+    //       input: text,
+    //       voice: voice,
+    //       response_format: "mp3"
+    //     })
+    //   });
+
+                    const payload = {
+                model: "gpt-4o-mini-tts",       // or your selected model
+                input: text,                    // user's text input
+                voice: voice,           // from your dropdown
+                response_format: "wav"
+                };
+
+                if (vibe !== "") {
+                payload.instructions = vibe;
+                }
+
+                const response = await fetch("https://api.openai.com/v1/audio/speech", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+                });
+    
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error.message || "Request failed");
+      }
+
+      const blob = await response.blob();
+      const audioUrl = URL.createObjectURL(blob);
+
+      // Create label from first few words
+      const label = text.length > 30 ? text.slice(0, 30) + "..." : text;
+
+      // Create audio element with label
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("border", "p-3", "rounded", "bg-white", "shadow-sm");
+
+      wrapper.innerHTML = `
+        <strong>${label}</strong>
+        <audio controls class="w-100 mt-2">
+          <source src="${audioUrl}" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      `;
+
+      // Add to top of list
+      audioList.prepend(wrapper);
+    } catch (err) {
+      alert("Error: " + err.message);
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = `Generate Speech`;
+    }
+  });
+</script>
+<script>
+    // Enable Bootstrap tooltips
+    document.addEventListener("DOMContentLoaded", () => {
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+  
+      // Try to load stored key
+      const storedKey = localStorage.getItem("openai_api_key");
+      const keyInput = document.getElementById("apiKey");
+      const keyStatus = document.getElementById("keyStatus");
+  
+      if (storedKey && keyInput) {
+        keyInput.value = storedKey;
+        keyStatus.textContent = "✅ Loaded from browser";
+        keyStatus.classList.remove("d-none");
+      }
+  
+      // Handle save key button
+      document.getElementById("storeKeyBtn").addEventListener("click", () => {
+        const key = keyInput.value.trim();
+        if (!key.startsWith("sk-")) {
+          alert("That doesn’t look like a valid OpenAI API key.");
+          return;
+        }
+  
+        localStorage.setItem("openai_api_key", key);
+        keyStatus.textContent = "✅ Saved!";
+        keyStatus.classList.remove("d-none");
+  
+        setTimeout(() => {
+          keyStatus.classList.add("d-none");
+        }, 3000);
+      });
+    });
+
+                document.getElementById("removeKeyBtn").addEventListener("click", () => {
+            localStorage.removeItem("openai_api_key");
+            document.getElementById("apiKey").value = "";
+
+            const keyStatus = document.getElementById("keyStatus");
+            keyStatus.textContent = "❌ Key removed from browser";
+            keyStatus.classList.remove("text-success");
+            keyStatus.classList.add("text-danger");
+            keyStatus.classList.remove("d-none");
+
+            setTimeout(() => {
+                keyStatus.classList.add("d-none");
+                keyStatus.classList.remove("text-danger");
+                keyStatus.classList.add("text-success");
+            }, 3000);
+            });
+  </script>
+  <!-- Bootstrap JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

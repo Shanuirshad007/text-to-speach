@@ -88,10 +88,19 @@
         <label for="vibeInput" class="form-label">Choose a Vibe</label>
         <select class="form-select" id="vibeInput">
           <option value="">-- None --</option>
-          <option value="Calm and soothing, like a therapist reassuring a patient.">Calm & Reassuring</option>
-          <option value="Energetic and cheerful, like a camp counselor.">Energetic & Cheerful</option>
-          <option value="Serious and professional, like a news anchor.">Professional</option>
-          <option value="Casual and laid-back, like talking to a friend.">Casual & Friendly</option>
+          <option value="Calm and soothing, like a therapist reassuring a patient.">🧘 Calm & Reassuring</option>
+          <option value="Energetic and cheerful, like a camp counselor.">⚡ Energetic & Cheerful</option>
+          <option value="Serious and professional, like a news anchor.">🧑‍💼 Professional & Clear</option>
+          <option value="Casual and friendly, like chatting with a close friend.">👋 Casual & Friendly</option>
+          <option value="Playful and fun, like a kids’ show host.">🎉 Playful & Animated</option>
+          <option value="Sarcastic and dry, like a stand-up comedian.">😏 Sarcastic & Witty</option>
+          <option value="Authoritative and confident, like a coach giving a pep talk.">🎤 Confident & Motivational</option>
+          <option value="Romantic and soft, like reading a love letter.">💖 Romantic & Soft</option>
+          <option value="Excited and high-energy, like announcing a big win.">🏆 Excited & Celebratory</option>
+          <option value="Narrative and engaging, like telling a bedtime story.">📖 Storyteller</option>
+          <option value="Chill and laid-back, like a surfer or lo-fi streamer.">🌊 Chill & Laid-Back</option>
+          <option value="Dark and mysterious, like a villain monologue.">🕵️ Dark & Dramatic</option>
+          <option value="Formal and respectful, like delivering a speech.">🎓 Formal & Respectful</option>
         </select>
       </div>
 
@@ -174,7 +183,7 @@
                 model: "gpt-4o-mini-tts",       // or your selected model
                 input: text,                    // user's text input
                 voice: voice,           // from your dropdown
-                response_format: "wav"
+                response_format: "mp3"
                 };
 
                 if (vibe !== "") {
